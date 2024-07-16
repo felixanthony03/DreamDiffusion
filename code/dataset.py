@@ -111,19 +111,21 @@ class eeg_pretrain_dataset(Dataset):
         super(eeg_pretrain_dataset, self).__init__()
         data = []
         images = []
-        self.input_paths = [str(f) for f in sorted(Path(path).rglob('*')) if is_npy_ext(f) and os.path.isfile(f)]
+        # self.input_paths = [str(f) for f in sorted(Path(path).rglob('*')) if os.path.isfile(f)]
 
-        assert len(self.input_paths) != 0, 'No data found'
+        # assert len(self.input_paths) != 0, 'No data found'
+        self.eeg_data = torch.load(f'{path}/eeg_5_95_std.pth')['dataset']
         self.data_len  = 512
         self.data_chan = 128
 
     def __len__(self):
-        return len(self.input_paths)
+        return len(self.eeg_data)
     
     def __getitem__(self, index):
-        data_path = self.input_paths[index]
+        # data_path = self.input_paths[index]
 
-        data = np.load(data_path)
+        # data = np.load(data_path)
+        data = self.eeg_data[index]['eeg'].numpy()
 
         if data.shape[-1] > self.data_len:
             idx = np.random.randint(0, int(data.shape[-1] - self.data_len)+1)
